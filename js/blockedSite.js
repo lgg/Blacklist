@@ -1,8 +1,9 @@
-var site = document.URL;
-site = site.substring(site.indexOf("?"));
-site = site.substring(site.indexOf("=") + 1);
+let currentUrl, originalUrl, blockedDomain;
+currentUrl = new URL(document.URL);
+originalUrl = currentUrl.searchParams.get("url");
+blockedDomain = currentUrl.searchParams.get("blocked");
 
-var motivationPhrases = [
+let motivationPhrases = [
     "Не теряй время",
     "Ничего страшного нет, просто начни",
     "Подумай о семье",
@@ -35,40 +36,11 @@ var motivationPhrases = [
     "Что не так?"
 ];
 
-console.log(motivationPhrases)
-
 $("#blockMessage").text(motivationPhrases[getRandomInt(motivationPhrases.length - 1)]); //site + " has been Blacklisted.");
 
-var content = $("#countdown");
-var i = 15;
-var interval = 0;
-
-function updateCountdown() {
-    content.text("Unlisting " + site + " in " + --i + " seconds...");
-    if (i === 0) {
-        clearInterval(interval);
-        chrome.tabs.getCurrent(function (tab) {
-            chrome.extension.getBackgroundPage().unlistSite(tab.id, site);
-        });
-        window.location = site;
-    }
-}
-
-function beginCountdown() {
-    i = 15;
-    content.text("Unlisting " + site + " in " + i + " seconds...");
-    interval = setInterval(function () {
-        updateCountdown(i)
-    }, 1000);
-}
-
-function modalHidden() {
-    clearInterval(interval);
-}
-
-function hideModal() {
-    $("#unlistModal").modal("hide");
-}
+let content = $("#countdown");
+let secondsUntilUnblock = 10;
+let intervalId = 0;
 
 $("#unlistModal").on('hidden', modalHidden);
 $("#cancelUnlist").click(hideModal);
@@ -78,10 +50,37 @@ chrome.extension.onMessage.addListener(
         chrome.tabs.getCurrent(function (tab) {
             if (tab.id == message) {
                 $("#unlistModal").modal("show");
-                beginCountdown();
+                beginCountdown(secondsUntilUnblock);
             }
         });
     });
+
+function updateCountdown() {
+    content.text("Unlisting " + blockedDomain + " in " + --secondsUntilUnblock + " seconds...");
+    if (secondsUntilUnblock === 0) {
+        clearInterval(intervalId);
+        chrome.tabs.getCurrent(function (tab) {
+            chrome.extension.getBackgroundPage().unlistSite(tab.id, blockedDomain);
+        });
+        window.location = originalUrl;
+    }
+}
+
+function beginCountdown(i) {
+    secondsUntilUnblock = i;
+    content.text("Unlisting " + blockedDomain + " in " + i + " seconds...");
+    intervalId = setInterval(function () {
+        updateCountdown()
+    }, 1000);
+}
+
+function modalHidden() {
+    clearInterval(intervalId);
+}
+
+function hideModal() {
+    $("#unlistModal").modal("hide");
+}
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
