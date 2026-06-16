@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Blacklist</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="popup__header">
+        <img class="popup__icon" src="icons/icon.48.png" alt="" />
+        <h1 class="popup__title">Blacklist</h1>
+      </header>
+
+      <p class="popup__site" id="site" hidden></p>
+
+      <button class="btn btn--primary" id="primary" hidden></button>
+
+      <p class="popup__note" id="note" hidden></p>
+
+      <footer class="popup__footer">
+        <button class="btn btn--link" id="clear">Clear entire blacklist</button>
+      </footer>
+    </main>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

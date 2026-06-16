@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Blacklisted</title>
+    <link rel="stylesheet" href="blocked.css" />
+  </head>
+  <body>
+    <main class="blocked">
+      <img class="blocked__icon" src="icons/icon.large.png" alt="" />
+      <h1 class="blocked__message" id="message"></h1>
+
+      <div class="blocked__actions" id="actions">
+        <button class="btn btn--ghost" id="unlist">Unlist this site</button>
+      </div>
+
+      <div class="blocked__countdown" id="countdown" hidden>
+        <p class="blocked__countdown-text" id="countdownText"></p>
+        <button class="btn btn--danger" id="cancel">Cancel unlisting</button>
+      </div>
+    </main>
+
+    <script type="module" src="blocked.js"></script>
+  </body>
+</html>
