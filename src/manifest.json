@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Blacklist",
+  "version": "2.0.0",
+  "description": "Blacklist is a very simple website blocker designed for personal use.",
+  "icons": {
+    "16": "icons/icon.16.png",
+    "48": "icons/icon.48.png",
+    "128": "icons/icon.128.png"
+  },
+  "homepage_url": "https://github.com/lgg/Blacklist",
+  "action": {
+    "default_icon": {
+      "16": "icons/icon.16.png",
+      "48": "icons/icon.48.png",
+      "128": "icons/icon.128.png"
+    },
+    "default_title": "Blacklist",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "declarativeNetRequest",
+    "webNavigation"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "incognito": "split"
+}

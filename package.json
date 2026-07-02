@@ -1,14 +1,23 @@
 {
-  "name": "Blacklist",
-  "version": "1.0.0",
+  "name": "blacklist",
+  "version": "2.0.0",
   "description": "Blacklist is a very simple website blocker designed for personal use.",
-  "repository": "git@github.com:rahulgi/Blacklist.git",
-  "author": "Rahul Gupta-Iwasaki",
+  "repository": "git@github.com:lgg/Blacklist.git",
+  "author": "Rahul Gupta-Iwasaki, Fedor (https://github.com/lgg)",
   "license": "MIT",
+  "type": "module",
+  "private": true,
   "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf build",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
-    "gh-pages": "^2.0.1"
+    "@types/chrome": "^0.0.270",
+    "esbuild": "^0.28.1",
+    "gh-pages": "^6.1.1",
+    "typescript": "^5.6.3"
   }
 }

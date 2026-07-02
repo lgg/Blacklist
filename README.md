@@ -1,37 +1,79 @@
-# Blacklist websites Chrome Extension
+# Blacklist
 
-**README IS OUTDATED**
+A very simple website blocker for Google Chrome, designed for personal use to
+help with procrastination.
 
-**WORK IN PROGRESS**
+When you find yourself on a site that's eating your time, click the Blacklist
+toolbar icon and hit **Blacklist this site**. From then on, navigating to that
+site redirects you to a block page while Blacklist is enabled.
 
-This is a very simple extension for Google Chrome. When you find yourself on a website that is taking too much of your time, simply hit the Blacklist button in the upper right corner of Chrome and you will be blocked from visiting that site while Blacklist remains active. To resume visiting any site blocked by Blacklist, you must visit the site, click the Blacklist extension button in the upper right corner of the browser, and then click the "unlist" button. You will be forced to wait for 15 seconds before the site is unlisted and you are redirected to the root url.
- 
-This extension is released for free in and can be installed directly from the Chrome store at https://chrome.google.com/webstore/detail/blacklist/jbpccandodannohfaoncogijbkfcmpgo?hl=en&gl=US.
-Alternatively, to install this extension directly from the source, download the code from GitHub, extract it, and then add it to Chrome as detailed in step 4 of Create and Load Extensions on this page: http://developer.chrome.com/extensions/getstarted.html.
- 
-To completely disable Blacklist, return to chrome://extensions and uncheck the box next to Blacklist.
+To start visiting a blocked site again, navigate to it, and on the block page
+click **Unlist this site**. You then have to wait out a 10-second countdown
+(you can cancel it) before the site is unlisted and you're redirected back to
+the original URL — just enough friction to make you think twice.
 
-## Installation
+To disable Blacklist entirely, open `chrome://extensions` and toggle it off.
 
-* install it as unpacked extension in Developer mode
+## 2026 rewrite
+
+This was originally written in 2012 against Manifest V2. It has been rewritten
+for modern Chrome:
+
+- **Manifest V3** — service worker instead of a persistent background page,
+  `action` instead of `browser_action`.
+- **`declarativeNetRequest`** dynamic redirect rules instead of the removed
+  blocking `webRequest` API.
+- **TypeScript** throughout, bundled with **esbuild**.
+- **No jQuery, no Bootstrap** — vanilla DOM and modern CSS.
+
+This fork also keeps the local changes from `lgg/Blacklist`: a dark blocked
+screen, motivational block-page phrases, updated authorship, and redirecting
+back to the exact URL after unlisting.
+
+## Project layout
+
+```
+src/
+  manifest.json          MV3 manifest
+  service-worker.ts       owns the declarativeNetRequest rules
+  lib/blocklist.ts        storage + DNR rule sync (shared)
+  lib/messages.ts         typed messaging helpers
+  popup/                  toolbar popup (html/css/ts)
+  blocked/                block page with unlist countdown (html/css/ts)
+icons/                    extension icons
+build.mjs                 esbuild build script
+```
+
+## Development
+
+```sh
+npm install
+npm run build      # one-off build into build/
+npm run watch      # rebuild on change
+npm run typecheck  # tsc --noEmit
+```
+
+Then load the unpacked extension:
+
+1. Open `chrome://extensions`
+2. Enable **Developer mode**
+3. Click **Load unpacked** and select the `build/` directory
+
+To package for the Chrome Web Store, zip the contents of `build/`.
 
 ## Roadmap
 
-* settings page (edit blocked sites)
-* add time ranges for blocking sites (time, dates range, workdays/holidays, for next 30 days (detox :) )
-* count site visit attempts (total, today, last 24 hours)
-    * create dynamic visualization
-    * optional show it on blocked page
-* add "one time allow button"
-    * and reason (tags) why u allowed to show this website for this time
-        * like: `work`, `study article` and others (come up with some)
-* store history of visited pages attempts
-* improve installation docs
-* upload to chrome store
-* post on habr/vc
+- Add an options page to view, edit, import, and export blocked sites.
+- Add schedules: workdays, date ranges, holidays, and temporary detox blocks.
+- Track blocked visit attempts by site, day, and rolling 24-hour window.
+- Add a one-time allow flow with a required reason such as `work` or `study`.
+- Store block/unblock history locally and optionally show stats on the block
+  page.
+- Add an optional custom new tab replacement with user-configurable widgets and
+  layout.
+- Add tests for host normalization, rule generation, and unblock redirects.
+- Add CI for typecheck, build, and extension artifact packaging.
 
 ## License
 
-* MIT, 2020
-* Author of original project: [Rahul Gupta-Iwasaki](https://github.com/rahulgi)
-* Author of current project: [lgg](https://github.com/lgg)
+MIT — see the `LICENSE` file.

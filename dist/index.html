@@ -1,40 +1,86 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Blacklist</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --fg: #111827;
+        --muted: #4b5563;
+        --border: #d1d5db;
+      }
 
-    <link rel=stylesheet href="bootstrap/css/bootstrap.min.css" type="text/css" >
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #050505;
+          --fg: #f5f5f5;
+          --muted: #a3a3a3;
+          --border: #3a3a3a;
+        }
+      }
 
-    <script type="text/javascript">
+      * {
+        box-sizing: border-box;
+      }
 
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-29217767-2']);
-      _gaq.push(['_trackPageview']);
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 32px;
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
 
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
+      main {
+        max-width: 680px;
+      }
 
-    </script>
+      h1 {
+        margin: 0 0 12px;
+        font-size: 48px;
+        line-height: 1.1;
+      }
+
+      p {
+        margin: 0 0 24px;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      a {
+        display: inline-block;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 18px;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:hover {
+        opacity: 0.85;
+      }
+    </style>
   </head>
   <body>
-    <div class="container" style="position:absolute; top:50%; left:50%; margin-top:-132px; margin-left:-585px;">
-      <h1>
-        <a href="https://chrome.google.com/webstore/detail/blacklist/jbpccandodannohfaoncogijbkfcmpgo" style="color:black">
-          Blacklist
-        </a>
-      </h1>
-      <hr class="featurette-divider">
-      <div class="featurette">
-        <h2>Created by <a href="https://rahulgi.com" style="color:black">Rahul Gupta-Iwasaki</a></h2>
-        <h3>Source can be found at <a href="https://github.com/rahulgi/Blacklist">github.com/rahulgi/Blacklist</a> and is released under the <a href="https://github.com/rahulgi/Blacklist/blob/master/LICENSE">MIT License</a></h3>
-      </div>
-      <hr class="feaurette-divider">
-      <div class="featurette">
-        <h4 style="float:right">Send bugs to <a href="mailto:ContactBlacklist@gmail.com">ContactBlacklist@gmail.com</a> or create an issue on <a href="https://github.com/rahulgi/Blacklist/issues">GitHub</a>.</h4>
-      </div>
-    </div>
+    <main>
+      <h1>Blacklist</h1>
+      <p>
+        A simple Manifest V3 Chrome extension for blocking distracting websites
+        with a small unlist countdown.
+      </p>
+      <a href="https://github.com/lgg/Blacklist">View source on GitHub</a>
+    </main>
   </body>
 </html>
