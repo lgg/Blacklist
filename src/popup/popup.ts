@@ -34,7 +34,7 @@ async function render(): Promise<void> {
     return;
   }
 
-  siteEl.innerHTML = "";
+  siteEl.textContent = "";
   siteEl.append("Current site: ");
   const strong = document.createElement("strong");
   strong.textContent = host;
