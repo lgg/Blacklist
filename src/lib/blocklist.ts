@@ -138,7 +138,9 @@ function buildRules(sites: string[]): chrome.declarativeNetRequest.Rule[] {
     action: {
       type: chrome.declarativeNetRequest.RuleActionType.REDIRECT,
       redirect: {
-        extensionPath: `/${BLOCKED_PAGE}?site=${encodeURIComponent(host)}`,
+        url: chrome.runtime.getURL(
+          `${BLOCKED_PAGE}?site=${encodeURIComponent(host)}`,
+        ),
       },
     },
     condition: {
