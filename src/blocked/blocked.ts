@@ -1,14 +1,10 @@
 /**
  * The page a blocked navigation lands on. It preserves the original UX: an
- * "unlist" action that forces a 15-second wait (with a cancel button) before
+ * "unlist" action that forces a 10-second wait (with a cancel button) before
  * the site is removed from the blacklist and you're redirected back to it.
  */
 
-import {
-  clearLastBlockedUrl,
-  getLastBlockedUrl,
-  normalizeHost,
-} from "../lib/blocklist.js";
+import { getLastBlockedUrl, normalizeHost } from "../lib/blocklist.js";
 import { sendMessage } from "../lib/messages.js";
 
 const UNLIST_SECONDS = 10;
@@ -105,6 +101,7 @@ function cancelCountdown(): void {
 
 async function finishUnlist(): Promise<void> {
   countdownTextEl.textContent = `Unlisting ${host}...`;
+  const redirectUrl = (await getLastBlockedUrl(host)) ?? `https://${host}/`;
   const ack = await sendMessage({ type: "unblock", host });
   if (!ack.ok) {
     countdownTextEl.textContent = ack.error ?? "Failed to unlist. Try again.";
@@ -113,8 +110,6 @@ async function finishUnlist(): Promise<void> {
     return;
   }
   // Rule is gone; navigating back to the site will no longer be redirected.
-  const redirectUrl = (await getLastBlockedUrl(host)) ?? `https://${host}/`;
-  await clearLastBlockedUrl(host);
   location.replace(redirectUrl);
 }
 

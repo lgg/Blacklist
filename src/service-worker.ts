@@ -10,6 +10,7 @@ import {
   blockHost,
   clearAll,
   isBlocked,
+  migrateLegacyStorage,
   rememberBlockedNavigation,
   syncRules,
   unblockHost,
@@ -17,11 +18,11 @@ import {
 import type { Ack, Message } from "./lib/messages.js";
 
 chrome.runtime.onInstalled.addListener(() => {
-  void syncRules();
+  void migrateAndSyncRules();
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  void syncRules();
+  void migrateAndSyncRules();
 });
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
@@ -59,4 +60,9 @@ async function rememberIfBlocked(url: string): Promise<void> {
   if (await isBlocked(url)) {
     await rememberBlockedNavigation(url);
   }
+}
+
+async function migrateAndSyncRules(): Promise<void> {
+  await migrateLegacyStorage();
+  await syncRules();
 }

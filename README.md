@@ -69,6 +69,8 @@ To package for the Chrome Web Store, zip the contents of `build/`.
 - Add a one-time allow flow with a required reason such as `work` or `study`.
 - Store block/unblock history locally and optionally show stats on the block
   page.
+- Add an optional custom new tab replacement with user-configurable widgets and
+  layout.
 - Add tests for host normalization, rule generation, and unblock redirects.
 - Add CI for typecheck, build, and extension artifact packaging.
 

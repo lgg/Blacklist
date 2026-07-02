@@ -9,7 +9,9 @@
  */
 
 const STORAGE_KEY = "blockedSites";
+const LEGACY_STORAGE_KEY = "blocked";
 const LAST_BLOCKED_URLS_KEY = "lastBlockedUrls";
+let migrationPromise: Promise<void> | undefined;
 
 /** Page (inside the extension) that a blocked navigation is redirected to. */
 export const BLOCKED_PAGE = "blocked.html";
@@ -36,11 +38,51 @@ export function hostFromUrl(url: string): string | null {
   }
 }
 
+function normalizeStoredHost(value: string): string | null {
+  const fromUrl = hostFromUrl(value);
+  if (fromUrl) return fromUrl;
+
+  const candidate = normalizeHost(value.trim().replace(/\/.*$/, ""));
+  return candidate && !candidate.includes(" ") ? candidate : null;
+}
+
 /** Read the current list of blocked hosts. */
 export async function getBlockedSites(): Promise<string[]> {
+  await migrateLegacyStorage();
+  return readBlockedSites();
+}
+
+async function readBlockedSites(): Promise<string[]> {
   const items = await chrome.storage.local.get(STORAGE_KEY);
   const sites = items[STORAGE_KEY];
   return Array.isArray(sites) ? (sites as string[]) : [];
+}
+
+/** Convert the old MV2 `blocked` URL list into the MV3 host-only list. */
+export async function migrateLegacyStorage(): Promise<void> {
+  migrationPromise ??= (async () => {
+    const items = await chrome.storage.local.get([
+      STORAGE_KEY,
+      LEGACY_STORAGE_KEY,
+    ]);
+    const current = Array.isArray(items[STORAGE_KEY])
+      ? (items[STORAGE_KEY] as string[])
+      : [];
+    const legacy = Array.isArray(items[LEGACY_STORAGE_KEY])
+      ? (items[LEGACY_STORAGE_KEY] as string[])
+      : [];
+
+    if (legacy.length === 0) return;
+
+    const sites = [...new Set([...current, ...legacy].map(normalizeStoredHost))]
+      .filter((site): site is string => Boolean(site))
+      .sort();
+
+    await chrome.storage.local.set({ [STORAGE_KEY]: sites });
+    await chrome.storage.local.remove(LEGACY_STORAGE_KEY);
+  })();
+
+  await migrationPromise;
 }
 
 async function getLastBlockedUrls(): Promise<Record<string, string>> {
@@ -135,6 +177,7 @@ export async function unblockHost(host: string): Promise<void> {
   const normalized = normalizeHost(host);
   const sites = (await getBlockedSites()).filter((s) => s !== normalized);
   await setBlockedSites(sites);
+  await clearLastBlockedUrl(normalized);
   await syncRules();
 }
 
