@@ -8,9 +8,9 @@ toolbar icon and hit **Blacklist this site**. From then on, navigating to that
 site redirects you to a block page while Blacklist is enabled.
 
 To start visiting a blocked site again, navigate to it, and on the block page
-click **Unlist this site**. You then have to wait out a 15-second countdown
-(you can cancel it) before the site is unlisted and you're redirected back —
-just enough friction to make you think twice.
+click **Unlist this site**. You then have to wait out a 10-second countdown
+(you can cancel it) before the site is unlisted and you're redirected back to
+the original URL — just enough friction to make you think twice.
 
 To disable Blacklist entirely, open `chrome://extensions` and toggle it off.
 
@@ -24,7 +24,11 @@ for modern Chrome:
 - **`declarativeNetRequest`** dynamic redirect rules instead of the removed
   blocking `webRequest` API.
 - **TypeScript** throughout, bundled with **esbuild**.
-- **No jQuery, no Bootstrap** — vanilla DOM and modern CSS (incl. dark mode).
+- **No jQuery, no Bootstrap** — vanilla DOM and modern CSS.
+
+This fork also keeps the local changes from `lgg/Blacklist`: a dark blocked
+screen, motivational block-page phrases, updated authorship, and redirecting
+back to the exact URL after unlisting.
 
 ## Project layout
 
@@ -56,6 +60,17 @@ Then load the unpacked extension:
 3. Click **Load unpacked** and select the `build/` directory
 
 To package for the Chrome Web Store, zip the contents of `build/`.
+
+## Roadmap
+
+- Add an options page to view, edit, import, and export blocked sites.
+- Add schedules: workdays, date ranges, holidays, and temporary detox blocks.
+- Track blocked visit attempts by site, day, and rolling 24-hour window.
+- Add a one-time allow flow with a required reason such as `work` or `study`.
+- Store block/unblock history locally and optionally show stats on the block
+  page.
+- Add tests for host normalization, rule generation, and unblock redirects.
+- Add CI for typecheck, build, and extension artifact packaging.
 
 ## License
 

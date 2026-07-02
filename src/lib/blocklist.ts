@@ -9,6 +9,7 @@
  */
 
 const STORAGE_KEY = "blockedSites";
+const LAST_BLOCKED_URLS_KEY = "lastBlockedUrls";
 
 /** Page (inside the extension) that a blocked navigation is redirected to. */
 export const BLOCKED_PAGE = "blocked.html";
@@ -42,6 +43,14 @@ export async function getBlockedSites(): Promise<string[]> {
   return Array.isArray(sites) ? (sites as string[]) : [];
 }
 
+async function getLastBlockedUrls(): Promise<Record<string, string>> {
+  const items = await chrome.storage.local.get(LAST_BLOCKED_URLS_KEY);
+  const urls = items[LAST_BLOCKED_URLS_KEY];
+  return urls && typeof urls === "object"
+    ? (urls as Record<string, string>)
+    : {};
+}
+
 async function setBlockedSites(sites: string[]): Promise<void> {
   await chrome.storage.local.set({ [STORAGE_KEY]: sites });
 }
@@ -52,6 +61,31 @@ export async function isBlocked(url: string): Promise<boolean> {
   if (!host) return false;
   const sites = await getBlockedSites();
   return sites.includes(host);
+}
+
+/** Remember the exact URL that triggered the block page for a host. */
+export async function rememberBlockedNavigation(url: string): Promise<void> {
+  const host = hostFromUrl(url);
+  if (!host) return;
+  const urls = await getLastBlockedUrls();
+  urls[host] = url;
+  await chrome.storage.local.set({ [LAST_BLOCKED_URLS_KEY]: urls });
+}
+
+/** Read the last blocked URL for a host so unlisting can return to it. */
+export async function getLastBlockedUrl(host: string): Promise<string | null> {
+  const normalized = normalizeHost(host);
+  const urls = await getLastBlockedUrls();
+  const url = urls[normalized];
+  return typeof url === "string" ? url : null;
+}
+
+/** Drop a stored blocked URL once it has been used. */
+export async function clearLastBlockedUrl(host: string): Promise<void> {
+  const normalized = normalizeHost(host);
+  const urls = await getLastBlockedUrls();
+  delete urls[normalized];
+  await chrome.storage.local.set({ [LAST_BLOCKED_URLS_KEY]: urls });
 }
 
 /** Build the full DNR ruleset from a list of hosts. */
@@ -107,5 +141,6 @@ export async function unblockHost(host: string): Promise<void> {
 /** Clear the entire blocklist. */
 export async function clearAll(): Promise<void> {
   await setBlockedSites([]);
+  await chrome.storage.local.remove(LAST_BLOCKED_URLS_KEY);
   await syncRules();
 }

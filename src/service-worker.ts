@@ -6,7 +6,14 @@
  * blocked page asks it to mutate the blocklist.
  */
 
-import { blockHost, clearAll, syncRules, unblockHost } from "./lib/blocklist.js";
+import {
+  blockHost,
+  clearAll,
+  isBlocked,
+  rememberBlockedNavigation,
+  syncRules,
+  unblockHost,
+} from "./lib/blocklist.js";
 import type { Ack, Message } from "./lib/messages.js";
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -15,6 +22,11 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onStartup.addListener(() => {
   void syncRules();
+});
+
+chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+  if (details.frameId !== 0 || !details.url) return;
+  void rememberIfBlocked(details.url);
 });
 
 chrome.runtime.onMessage.addListener(
@@ -40,5 +52,11 @@ async function handle(message: Message): Promise<void> {
     case "clear":
       await clearAll();
       break;
+  }
+}
+
+async function rememberIfBlocked(url: string): Promise<void> {
+  if (await isBlocked(url)) {
+    await rememberBlockedNavigation(url);
   }
 }

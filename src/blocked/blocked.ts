@@ -4,12 +4,55 @@
  * the site is removed from the blacklist and you're redirected back to it.
  */
 
-import { normalizeHost } from "../lib/blocklist.js";
+import {
+  clearLastBlockedUrl,
+  getLastBlockedUrl,
+  normalizeHost,
+} from "../lib/blocklist.js";
 import { sendMessage } from "../lib/messages.js";
 
-const UNLIST_SECONDS = 15;
+const UNLIST_SECONDS = 10;
+
+const motivationPhrases = [
+  "Не теряй время",
+  "Ничего страшного нет, просто начни",
+  "Подумай о семье",
+  "А зачем ты этим занимаешься?",
+  "Почему ты зашел сюда?",
+  "Давай, соберись",
+  "У тебя получится",
+  "Я верю в тебя",
+  "Ты сможешь",
+  "Просто начни",
+  "Попробуй начать",
+  "Встань и подыши",
+  "Просто открой то, что нужно сделать",
+  "Что не так в этот раз?",
+  "Это несерьезно",
+  "Надо делать деньги",
+  "Тебе нужны бабки?",
+  "И как ты достигнешь чего-то?",
+  "Да сколько можно?",
+  "Делай, делай, делай",
+  "Мой отец работал много, мать немногим меньше",
+  "Мне нужно больше денег",
+  "Просто закончи с этим",
+  "Возьми себя в руки",
+  "Сегодня именно тот день, когда ты изменишь себя",
+  "Пора меняться",
+  "У тебя все получится",
+  "Иди работай",
+  "Just Do It!",
+  "Ламба сама себя не купит",
+  "Не стыдно?",
+  "Да, ты зашел сюда, но ты молодец. Иди работай дальше",
+  "Хватит прокрастинировать",
+  "Почему ты прокрастинируешь?",
+  "Что не так?",
+];
 
 const messageEl = document.getElementById("message") as HTMLHeadingElement;
+const siteEl = document.getElementById("site") as HTMLParagraphElement;
 const actionsEl = document.getElementById("actions") as HTMLDivElement;
 const countdownEl = document.getElementById("countdown") as HTMLDivElement;
 const countdownTextEl = document.getElementById(
@@ -22,10 +65,12 @@ const params = new URLSearchParams(location.search);
 const host = normalizeHost(params.get("site") ?? "");
 
 function renderMessage(): void {
-  messageEl.textContent = "";
-  const strong = document.createElement("strong");
-  strong.textContent = host || "This site";
-  messageEl.append(strong, " has been blacklisted.");
+  messageEl.textContent =
+    motivationPhrases[Math.floor(Math.random() * motivationPhrases.length)] ??
+    "Не теряй время";
+  siteEl.textContent = host
+    ? `${host} is blacklisted.`
+    : "This site is blacklisted.";
 }
 
 let interval: number | undefined;
@@ -68,7 +113,9 @@ async function finishUnlist(): Promise<void> {
     return;
   }
   // Rule is gone; navigating back to the site will no longer be redirected.
-  location.replace(`https://${host}/`);
+  const redirectUrl = (await getLastBlockedUrl(host)) ?? `https://${host}/`;
+  await clearLastBlockedUrl(host);
+  location.replace(redirectUrl);
 }
 
 unlistEl.addEventListener("click", startCountdown);
